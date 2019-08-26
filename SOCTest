@@ -81,7 +81,7 @@ class PageBusca
   
    
  #### A função preencher, vai preencher um campo texto passando o elemento já mapeado usando a função send_keys do watir,
-  def preencher(element, value, assert = "undefined", flag_exist: true)
+  def preencher(element, value)
 
     begin
       if flag_exist
