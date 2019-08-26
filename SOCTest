@@ -1,0 +1,116 @@
+Plano de Testes.
+
+Abrir pagina https://ww2.soc.com.br/blog/
+Verificar se o campo de preenchimento Buscar existe
+Digitar informação no campo buscar
+Verificar se o botao Buscar existe
+Clicar no botão Buscar
+Verificar retorno botão Buscar
+
+
+#### TEST MAIN #####
+
+describe "Desafio_WebSite" do
+  before :each do
+    $browser = Watir::Browser.new :chrome
+    p "Abrir pagina https://ww2.soc.com.br/blog/"
+    $browser.window.maximize
+    $browser.goto("https://ww2.soc.com.br/blog/")
+  end
+
+  after(:all) do
+    begin
+      $browser.close
+    rescue => ex
+      p ex
+    end
+  end
+
+  it "Desafio_WebSite" do
+  begin   
+
+    # Valores: VLBusca
+    VLBusca= "CPF"
+
+    pageBusca = PageBusca.new
+    p "Efetuar busca na pagina"
+    pageBusca.efetuar_busca(VLBusca)
+    sleep 1
+    valida_busca(VLBusca)
+
+  rescue => ex
+    p ex
+  end
+end
+
+#### Arquivo locator da page .rb
+module PageLocator
+ 
+  def text_buscar_elem
+    $browser.input(name: 's',class: 'form-control input-com-icone mt0')
+  end 
+  
+  def bt_buscar_elem
+    $browser.input(type: 'submit')
+  end
+ 
+  def resultado
+     $browser.div(class: 'col-md-10 col-md-offset-1 col-xs-12').h2(class: 'pagetitle search')
+  end  
+ 
+end
+
+#### Arquivo Page do teste .rb
+require_relative "locators/PageLocator"
+
+class PageBusca
+  include PageLocator
+  
+  def efetuar_busca(VLBusca)
+    p "Preencher campo Buscar"
+    preencher(text_buscar_elem,VLBusca)
+    p "Clicar no campo Buscar"
+    clique(bt_buscar_elem)
+  end
+   
+  def valida_busca(string)
+     if resultado.text.include? string
+        p "Busca realizada com sucesso"
+     end
+  end  
+  
+   
+ #### A função preencher, vai preencher um campo texto passando o elemento já mapeado usando a função send_keys do watir,
+  def preencher(element, value, assert = "undefined", flag_exist: true)
+
+    begin
+      if flag_exist
+        result = elem_exists?(element)
+      else
+        result = true
+      end
+      if result
+        element.to_subtype.clear
+        element.focus
+        element.send_keys value
+      end
+  end
+
+ #### A função clique, vai realizar o clique no elemento do type input, em caso de falha tenta via javascript.
+  
+  def clique(elem)
+
+    puts 'Botão: ' + elem.inspect if $log_console
+    cont = 0
+    valida_clique = true
+    begin
+      elem_exists?(elem)
+      scroll_to_element(elem)
+      elem.click
+      valida_clique = true
+    end
+    if valida_clique == false
+        raise "Erro ao dar o clique no botão #{exception.message[0..850].gsub('"','').gsub("'", "")}"
+    end 
+end
+
